@@ -5,7 +5,17 @@ var PLAYING_GAME = 1;
 var GAME_OVER = 2;
 var player;
 var coin;
+
+
 var enemies;
+
+var quarter;
+var penny;
+
+function preload() {
+  quarter = loadImage("images/quarter.jpg");
+  penny = loadImage("images/penny.jpg");
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -14,6 +24,8 @@ function setup() {
 
 function draw() {
   if(gameState == WAITING) {
+    background(255);
+    fill(0);
     text("PRESS KEY TO PLAY", width/2, height/2);  
   }
   else if(gameState == PLAYING_GAME) {
@@ -21,28 +33,34 @@ function draw() {
     //text("PLAYING GAME", width/2, height/2);
     for (var i = 0; i < enemies.length; i++) {
       var enemy = enemies.get(i);
-      enemy.attractionPoint(.2, player.position.x, player.position.y);
+      enemy.attractionPoint(.02, player.position.x, player.position.y);
     }
-    player.overlap(coin, collect);
+    player.overlap(coin, coinCollect);
     enemies.overlap(player, dead);
     drawSprites();
+    fill(0);
+    text(score, 20,20);
   }
   else if (gameState == GAME_OVER) {
+    background(0);
+    fill(255);
     text("GAME OVER", width/2, height/2);
   }
 }
 function dead(collector, collected) {
-  collected.remove();
-  collector.clear();
+  //allSprites is a p5play system variable, we clear everything out
+  allSprites.clear();
   gameState = GAME_OVER;
 }
 
-function collect(collector, collected) {
+function coinCollect(collector, collected) {
     collected.remove();
-    score++;
-    coin = createSprite(random(width), random(height), 10, 10);
-
+    //since we assigned the points attribute to all of our coins
+    //we know we can access it here
+    score+= collected.points;
+    generateCoin();
 }
+
 
 function keyPressed() {
   if(gameState == WAITING) {
@@ -70,7 +88,7 @@ function keyPressed() {
     
   }
   else if (gameState == GAME_OVER) {
-    
+    gameState = WAITING;
   }
 }
   
@@ -85,12 +103,27 @@ function startGame() {
       var newEnemy = createSprite(random(width), random(height), 20, 20);
       enemies.add(newEnemy);
     }
-    //CREATE THE COIN
-    coin = createSprite(random(width), random(height), 10, 10);
+    generateCoin();
   
 }
   
-  
+function generateCoin() {
+    //CREATE THE COIN
+    //points doesn't exist as an attribute of the Sprite class
+    //I add it on the fly here.
+    var s = random(0,50);
+    if (s > 25) {
+      coin = createSprite(random(width), random(height), 10, 10);
+      coin.points = 25;
+      coin.addImage(quarter);
+    }
+    else {
+      coin = createSprite(random(width), random(height), 25, 25);
+      coin.points = 1;
+      coin.addImage(penny);
+    }
+
+}
   
   
   
