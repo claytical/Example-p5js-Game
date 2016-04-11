@@ -11,8 +11,15 @@ var enemies;
 
 var quarter;
 var penny;
+var enemy_sprite_sheet;
+var enemy_fighting_sprite_sheet;
+var enemy_animation;
+var enemy_fighting_animation;
 
 function preload() {
+  //123x112 for soldier sprite sheet
+  enemy_sprite_sheet = loadSpriteSheet('images/solider_stand.png', 123, 112, 8);
+  enemy_fighting_sprite_sheet = loadSpriteSheet('images/fighting.png', 124, 116, 10);
   quarter = loadImage("images/quarter.jpg");
   penny = loadImage("images/penny.jpg");
 }
@@ -97,10 +104,15 @@ function startGame() {
     score = 0;
     //CREATE THE PLAYER
     player = createSprite(width/2, height/2, 30, 30);
+    enemy_animation = loadAnimation(enemy_sprite_sheet);
+    enemy_fighting_animation = loadAnimation(enemy_fighting_sprite_sheet);
     //CREATE SOME ENEMIES
     enemies = new Group();
     for (var i = 0; i < 3; i++) {
       var newEnemy = createSprite(random(width), random(height), 20, 20);
+      newEnemy.addAnimation("stand", enemy_animation);
+      newEnemy.addAnimation("fight", enemy_fighting_animation);
+      newEnemy.changeAnimation("fight");
       enemies.add(newEnemy);
     }
     generateCoin();
